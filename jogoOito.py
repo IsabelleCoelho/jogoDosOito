@@ -1,6 +1,7 @@
 from random import uniform
 
 objetivo = [[1,2,3],[8,0,4],[7,6,5]]
+solucao = []
 
 class Tabuleiro:
     def __init__(self, preencher=True, pai=None, matriz=objetivo, movimentoOriginario=None):
@@ -12,7 +13,7 @@ class Tabuleiro:
             self.preencher()
 
     def preencher(self):
-        for i in range(50):
+        for i in range(5000):
             valor = int(uniform(0, 3))
             posicaoZero = self.identificarPosicaoElemento(0, self.tabuleiro)
             if valor == 0 and posicaoZero[1] != 2:
@@ -35,15 +36,22 @@ class Tabuleiro:
                     return (i,j)
 
     def mostrarTabuleiro(self):
+        if self.movimentoOriginario == None:
+            print("Tabuleiro Inicial")
+        else:
+            print("Movimento: " + self.movimentoOriginario)
         for linha in self.tabuleiro:
             print(linha)
     
     #sempre que fizer uma movimentacao, o retorno sera a nova matriz
     def movimentar(self, movimento):
-        novaMatriz = self.tabuleiro
+        novaMatriz = [[None for _ in range(3)] for _ in range(3)]
+        for i in range(3):
+            for j in range(3):
+                novaMatriz[i][j] = self.tabuleiro[i][j]
+
         posicaoZero = self.identificarPosicaoElemento(0, self.tabuleiro)
         if movimento == "D":
-            #salvar o valor que pertencia ao elemento da direita do zero
             valorAntigo = self.tabuleiro[posicaoZero[0]][posicaoZero[1] +1]
             novaMatriz[posicaoZero[0]][posicaoZero[1] +1] = 0
             novaMatriz[posicaoZero[0]][posicaoZero[1]] = valorAntigo
@@ -80,6 +88,12 @@ class Tabuleiro:
             y = y*(-1)
         return x+y
 
+    def compararMatrizes(self, matriz):
+        for i in range(3):
+            for j in range(3):
+                if self.tabuleiro[i][j] != matriz[i][j]:
+                    return False
+        return True
 
 
 class BuscaInformada:
@@ -89,109 +103,115 @@ class BuscaInformada:
     
     def solucionar(self):
         self.matrizesExistentes.append(self.matriz)
-        while self.matriz != objetivo:
+        while self.matriz.compararMatrizes(objetivo) == False:
+        #for _ in range(3):
             posicaoMenorPeso = 0
             movimentosPossiveis = self.analiseMovimentos()
-            for i in range(len(movimentosPossiveis)):
-                tabuleiro = Tabuleiro(False, self.matriz, self.matriz.movimentar(i), i)
-                if self.analiseExistencia(tabuleiro) == False:
+            while len(movimentosPossiveis) != 0:
+                movimento = movimentosPossiveis.pop(0)
+                tabuleiro = Tabuleiro(False, self.matriz, self.matriz.movimentar(movimento), movimento)
+                if self.analiseExistencia(tabuleiro.tabuleiro) == False:
                     self.matrizesExistentes.append(tabuleiro)
                 self.matriz.jaVisitado = True
             for i in range(len(self.matrizesExistentes)):
                 menorPeso = 0
-                #PROVAVELMENTE O ERRO ESTA NESSA PARTE
                 if self.matrizesExistentes[i].jaVisitado == False:
                     if self.matrizesExistentes[i].pesoTabuleiro() < self.matrizesExistentes[posicaoMenorPeso].pesoTabuleiro():
                         menorPeso = self.matrizesExistentes[i].pesoTabuleiro()
                         posicaoMenorPeso = i
+
             self.matriz = self.matrizesExistentes[posicaoMenorPeso]
-        print("Resolvendo....")
         self.mostrarSolucao()
 
     def mostrarSolucao(self):
-        if self.matriz.pai != None:
-            self.pai.mostrarSolucao()
-            print(self.matriz.movimentoOriginario)
-        self.matriz.mostrarTabuleiro()
+        while self.matriz.pai != None:
+            solucao.append(self.matriz)
+            self.matriz = self.matriz.pai   
+        solucao.append(self.matriz)
+        for _ in range(len(solucao)):
+            tabuleiro = solucao.pop()
+            tabuleiro.mostrarTabuleiro()
 
     def analiseExistencia(self, matriz):
         for i in range(len(self.matrizesExistentes)):
-            if matriz == self.matrizesExistentes[i]:
+            if self.matrizesExistentes[i].compararMatrizes(matriz):
                 return True
         return False
 
     def analiseMovimentos(self):
         posicaoZero = self.matriz.identificarPosicaoElemento(0, self.matriz.tabuleiro)
         posicoes = []
-        if posicaoZero == (0,0):
-            posicoes = ["D","B"]
-        elif posicaoZero == (0,2):
-            posicoes = ["E","B"]
-        elif posicaoZero == (2,0):
-            posicoes = ["C","D"]
-        elif posicaoZero == (2,2):
-            posicoes = ["C","E"]
-        elif posicaoZero == (0,1):
-            posicoes = ["E","D","B"]
-        elif posicaoZero == (1,0):
-            posicoes = ["C","D","B"]
-        elif posicaoZero == (2,1):
-            posicoes = ["E","D","C"]
-        elif posicaoZero == (1,2):
-            posicoes = ["C","E","B"]
-        elif posicaoZero == (1,1):
-            posicoes = ["C","D","B","E"]
+        temPai = False
         if self.matriz.movimentoOriginario != None:
             movOrig = self.matriz.movimentoOriginario
-            if posicaoZero == (0,0):
+            temPai = True
+        if posicaoZero == (0,0):
+            posicoes = ["D","B"]
+            if temPai:
                 if movOrig == "E":
                     posicoes.remove("D")
                 else:
                     posicoes.remove("B")
-            elif posicaoZero == (0,2):
+        elif posicaoZero == (0,2):
+            posicoes = ["E","B"]
+            if temPai:
                 if movOrig == "D":
                     posicoes.remove("E")
                 else:
                     posicoes.remove("B")
-            elif posicaoZero == (2,0):
+        elif posicaoZero == (2,0):
+            posicoes = ["C","D"]
+            if temPai:
                 if movOrig == "E":
                     posicoes.remove("D")
                 else:
                     posicoes.remove("C")
-            elif posicaoZero == (2,2):
+        elif posicaoZero == (2,2):
+            posicoes = ["C","E"]
+            if temPai:
                 if movOrig == "D":
                     posicoes.remove("E")
                 else:
                     posicoes.remove("C")
-            elif posicaoZero == (0,1):
+        elif posicaoZero == (0,1):
+            posicoes = ["E","D","B"]
+            if temPai:
                 if movOrig == "E":
                     posicoes.remove("D")
                 elif movOrig == "D":
                     posicoes.remove("E")
                 else:
                     posicoes.remove("B")
-            elif posicaoZero == (1,0):
+        elif posicaoZero == (1,0):
+            posicoes = ["C","D","B"]
+            if temPai:
                 if movOrig == "B":
                     posicoes.remove("C")
                 elif movOrig == "E":
                     posicoes.remove("D")
                 else:
                     posicoes.remove("B")
-            elif posicaoZero == (2,1):
+        elif posicaoZero == (2,1):
+            posicoes = ["E","D","C"]
+            if temPai:
                 if movOrig == "D":
                     posicoes.remove("E")
                 elif movOrig == "E":
                     posicoes.remove("D")
                 else:
                     posicoes.remove("C")
-            elif posicaoZero == (1,2):
+        elif posicaoZero == (1,2):
+            posicoes = ["C","E","B"]
+            if temPai:
                 if movOrig == "B":
                     posicoes.remove("C")
                 elif movOrig == "D":
                     posicoes.remove("E")
                 else:
                     posicoes.remove("B")
-            elif posicaoZero == (1,1):
+        elif posicaoZero == (1,1):
+            posicoes = ["C","D","B","E"]
+            if temPai:
                 if movOrig == "C":
                     posicoes.remove("B")
                 elif movOrig == "B":
