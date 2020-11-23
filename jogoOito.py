@@ -13,7 +13,7 @@ class Tabuleiro:
             self.preencher()
 
     def preencher(self):
-        for i in range(5000):
+        for i in range(10000):
             valor = int(uniform(0, 3))
             posicaoZero = self.identificarPosicaoElemento(0, self.tabuleiro)
             if valor == 0 and posicaoZero[1] != 2:
@@ -49,7 +49,6 @@ class Tabuleiro:
         for i in range(3):
             for j in range(3):
                 novaMatriz[i][j] = self.tabuleiro[i][j]
-
         posicaoZero = self.identificarPosicaoElemento(0, self.tabuleiro)
         if movimento == "D":
             valorAntigo = self.tabuleiro[posicaoZero[0]][posicaoZero[1] +1]
@@ -119,7 +118,6 @@ class BuscaInformada:
                     if self.matrizesExistentes[i].pesoTabuleiro() < self.matrizesExistentes[posicaoMenorPeso].pesoTabuleiro():
                         menorPeso = self.matrizesExistentes[i].pesoTabuleiro()
                         posicaoMenorPeso = i
-
             self.matriz = self.matrizesExistentes[posicaoMenorPeso]
         self.mostrarSolucao()
 
@@ -224,7 +222,8 @@ class BuscaInformada:
 
 
 if __name__ == "__main__":
-    #opcao = input("Como gostaria de resolver o Jogo dos 8? 1-Busca Informada  2-Busca Cega \n")
-    #if opcao == 1:
-    busca = BuscaInformada()
-    busca.solucionar()
+    opcao = input("Como gostaria de resolver o Jogo dos 8?\n1-Busca Informada  2-Busca Cega\n")
+    opcao = int(opcao)
+    if opcao == 1:
+        busca = BuscaInformada()
+        busca.solucionar()
