@@ -103,7 +103,6 @@ class BuscaInformada:
     def solucionar(self):
         self.matrizesExistentes.append(self.matriz)
         while self.matriz.compararMatrizes(objetivo) == False:
-        #for _ in range(3):
             posicaoMenorPeso = 0
             movimentosPossiveis = self.analiseMovimentos()
             while len(movimentosPossiveis) != 0:
