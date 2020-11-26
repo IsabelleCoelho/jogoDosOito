@@ -103,19 +103,20 @@ class BuscaInformada:
     def solucionar(self):
         self.matrizesExistentes.append(self.matriz)
         while self.matriz.compararMatrizes(objetivo) == False:
-            posicaoMenorPeso = 0
             movimentosPossiveis = self.analiseMovimentos()
             while len(movimentosPossiveis) != 0:
                 movimento = movimentosPossiveis.pop(0)
                 tabuleiro = Tabuleiro(False, self.matriz, self.matriz.movimentar(movimento), movimento)
                 if self.analiseExistencia(tabuleiro.tabuleiro) == False:
                     self.matrizesExistentes.append(tabuleiro)
-                self.matriz.jaVisitado = True
+            self.matriz.jaVisitado = True
+
+            posicaoMenorPeso = 0
+            while self.matrizesExistentes[posicaoMenorPeso].jaVisitado:
+                posicaoMenorPeso += 1
             for i in range(len(self.matrizesExistentes)):
-                menorPeso = 0
                 if self.matrizesExistentes[i].jaVisitado == False:
                     if self.matrizesExistentes[i].pesoTabuleiro() < self.matrizesExistentes[posicaoMenorPeso].pesoTabuleiro():
-                        menorPeso = self.matrizesExistentes[i].pesoTabuleiro()
                         posicaoMenorPeso = i
             self.matriz = self.matrizesExistentes[posicaoMenorPeso]
         self.mostrarSolucao()
