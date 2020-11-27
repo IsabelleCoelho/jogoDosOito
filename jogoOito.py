@@ -96,9 +96,10 @@ class Tabuleiro:
 
 
 class BuscaInformada:
-    def __init__(self):
-        self.matriz = Tabuleiro()
+    def __init__(self, tabuleiro=Tabuleiro()):
+        self.matriz = tabuleiro
         self.matrizesExistentes = []
+        self.solucionar()
     
     def solucionar(self):
         self.matrizesExistentes.append(self.matriz)
@@ -222,8 +223,4 @@ class BuscaInformada:
 
 
 if __name__ == "__main__":
-    opcao = input("Como gostaria de resolver o Jogo dos 8?\n1-Busca Informada  2-Busca Cega\n")
-    opcao = int(opcao)
-    if opcao == 1:
-        busca = BuscaInformada()
-        busca.solucionar()
+    busca = BuscaInformada()
