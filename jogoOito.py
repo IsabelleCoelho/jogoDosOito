@@ -1,4 +1,5 @@
 from random import uniform
+import time
 
 objetivo = [[1,2,3],[8,0,4],[7,6,5]]
 solucao = []
@@ -223,4 +224,4 @@ class BuscaInformada:
 
 
 if __name__ == "__main__":
-    busca = BuscaInformada()
+    BuscaInformada()
